@@ -1,0 +1,400 @@
+// JavaScript Document
+// Require enter.js para manejo de teclado
+/*
+ * @modificaciones
+ * Fecha        Autor                   Descripcion
+ * 2018-05-21   Carlos Mejía            Mantis 2994     Pasajes Aéreos - Adjudicatario Fallido - Pasajes aéreos  
+ */
+/*
+Parámetro generales de presentación
+*/
+var prg_formato="label";
+var prg_comilla2='"';
+var prg_comilla1="'";
+var prg_color_foco='"#FFFF99"';
+var prg_color_sin_foco='"#FFFFFF"';
+var prg_color=true;
+var prg_imagenCargando = '../img/cargando.gif';
+/*
+Funciones básicas
+*/
+/*
+Esta función valida si se recibe un valor
+*/
+function valorOpcional (variable, valorDefecto)
+{
+   if (typeof variable == "undefined") {
+      variable=valorDefecto;
+   } //Fin si tipo no existe
+   return variable;
+} //Fin valorOpcional
+/*
+Esta función dibuja en un div
+pasajes aéreos
+ **/
+function asignarValorDiv(nombre, valor)
+{
+    sessionStorage.clear();
+    sessionStorage.setItem('proveedor', -1);
+    document.getElementById(nombre).innerHTML = valor;
+    if (document.getElementById('codigoProcesoPasajes'))
+    {
+        var codigo = document.getElementById('codigoProcesoPasajes').value;
+        if (codigo == 148 || codigo == 149)
+        {
+            if (document.getElementById('cmbProveedor'))
+            {
+                var e = document.getElementById('cmbProveedor');
+                var strUser = e.options[e.selectedIndex].value;
+                sessionStorage.setItem('proveedor', strUser);
+            }
+            if (document.getElementById('cmbProveedorFallido'))
+            {
+                var e = document.getElementById('cmbProveedorFallido');
+       
+                var strUser = e.options[e.selectedIndex].value;
+                sessionStorage.setItem('proveedor', strUser);
+            }
+        }
+    }
+}
+
+function ultimoCombo()
+{
+    sessionStorage.clear();
+    sessionStorage.setItem('proveedor', -1);
+    if (document.getElementById('cmbProveedor'))
+    {
+        var e = document.getElementById('cmbProveedor');
+        var strUser = e.options[e.selectedIndex].value;
+        sessionStorage.setItem('proveedor', strUser);
+    }
+    if (document.getElementById('cmbProveedorFallido'))
+    {
+        var e = document.getElementById('cmbProveedorFallido');
+        var strUser = e.options[e.selectedIndex].value;
+        sessionStorage.setItem('proveedor', strUser);
+    }
+}
+/*
+Esta función asigna la imagen de cargando en el div indicando
+*/
+function asignarImagenCargando (nombre)
+{
+   asignarValorDiv (nombre,'<img src="'+prg_imagenCargando+'" width="16" height="16" />');	
+}
+/*
+Esta función genera un label
+*/
+function Label (nombre, valor, tipo, tamanio, rows)
+{
+  var res="";
+  if (prg_formato=="normal")
+	if (tipo=="textArea")
+      res="<textarea name='"+nombre+"' id='"+nombre+"' cols='"+tamanio+"' rows='"+rows+"' readonly='readonly' class='deshabilitado'>"+valor+"</textarea>";
+    else
+	  res="<input name='"+nombre+"' type='"+tipo+"' id='"+nombre+"' size='"+tamanio+"' value='"+valor+"' readonly='readonly' class='deshabilitado'/>";
+  else
+	res="<label>"+valor+"</label>";  
+  return res;
+}
+/*
+Esta función dibuja un label en un div
+*/
+function dibujarLabel (nombreDiv, nombre, valor, tipo, tamanio, rows)
+{ 
+  var res=Label (nombre, valor, tipo, tamanio, rows);
+  asignarValorDiv (nombreDiv, res);
+}
+/*
+Esta función controla que el ancho no sobrepase el límite.
+si recibe una caja contador en su parametro value asigna
+el número de caracteres en esta caja
+*/
+function controlarAncho (cajaActual, cajaContador, limite)
+{
+   
+   var tecla;
+   var in_value;
+   var out_value;  
+   if (limite>0)
+   {
+      if (cajaActual.value.length > limite) {
+         in_value = cajaActual.value;
+		 out_value = in_value.substring(0,limite);
+		 cajaActual.value = out_value;
+	  }
+	  if (cajaContador != '') {
+		 $(cajaContador).value=cajaActual.value.length;
+	  } //Fin si cajaContador != ''
+   } //Fin si limite > 0
+} //Fin controlarAncho
+/*
+Esta función dibuja una caja de texto
+*/
+function CajaTexto (nombre, tipo, valor, tamanio, maxchar, 
+                    editable, extra, filas, cajaContador, 
+					siguiente, onFocus, onBlur, onKeyUp,
+					onKeyPress)
+{
+   var html="";   
+   var eventos="";
+   valor=valorOpcional(valor,'');
+   extra=valorOpcional(extra,'');
+   filas=valorOpcional(filas,'0');
+   cajaContador=valorOpcional(cajaContador,'');
+   siguiente=valorOpcional(siguiente,'');
+   onFocus=valorOpcional(onFocus,'');
+   onBlur=valorOpcional(onBlur,'');
+   onKeyUp=valorOpcional(onKeyUp,'');
+   onKeyPress=valorOpcional(onKeyPress,'');
+   
+   onFocus+=" this.select(); ";
+   if (editable) {
+      eventos=generarEvento (siguiente, onFocus, onBlur, onKeyPress);
+	  cajaContador='"'+cajaContador+'"';
+      eventos+=" onkeyup='controlarAncho(this,"+cajaContador+","+maxchar+")";
+      if (onKeyUp != '') {
+         eventos+=onKeyUp;
+      } //Fin si hay función en keyUp
+	  eventos+="' ";
+      if (tipo == 'textArea') {
+         html+="\t<textarea name='"+nombre+"' ";
+         html+="id='"+nombre+"' ";
+         html+="cols='"+tamanio+"' ";
+         html+="rows='"+filas+"' ";
+         html+=extra+" ";
+         html+=eventos+">";
+         html+=valor;
+         html+="</textarea>\n";
+      } else {
+         html+="\t<input name='"+nombre+"' type='"+tipo+"' id='"+nombre+"' size='"+tamanio+"' maxlength='"+maxchar+"' value = '"+valor+"' "+extra+" "+eventos+"/>\n";		  
+      } //Sin si es textArea
+      html+="<div id='div"+nombre+"Error' class='mensajeError' style='display:none'></div>\n";
+   } else {
+      if (tipo == "password") {
+         html+=Label (nombre, '*****', tipo, tamanio, 0);
+      } else {
+         html+=Label (nombre, valor, tipo, tamanio, maxchar );		  
+      } //Fin si es password no editable
+   } //Fin si es Editables
+   return html;
+} //Fin CajaTexto
+/*
+Esta función busca un valor en un arreglo
+y devuelve el indice relacionado
+El arreglo tiene que se un arreglo de arreglos
+*/
+function buscarArreglo(arreglo, seleccionado, indice_id, indice_valor)
+{
+  var res="";
+  var i;
+  var elemento;
+  for (i=0; i<arreglo.length; i++) 
+  {
+	elemento=arreglo[i];
+	if (seleccionado==elemento[indice_id])
+	{
+	  res=elemento[indice_valor];
+	  break;
+	}
+  }	  	
+  return res;
+}
+/*Esta función aumenta los eventos para el color cuando tiene el foco
+y el paso al siguiente cuando da enter*/
+function generarEvento (siguiente, onFocus, onBlur, onKeyPress)
+{
+  var res="";  
+  siguiente=valorOpcional(siguiente,'');
+  onFocus=valorOpcional(onFocus,'');
+  onBlur=valorOpcional(onBlur,'');
+  onKeyPress=valorOpcional(onKeyPress,'');
+  if (prg_color)
+    res+="onfocus='this.style.background="+prg_color_foco+"; "+onFocus+"' onblur='this.style.background="+prg_color_sin_foco+"; "+onBlur+"' "; 
+  else
+  {
+    if (onFocus!="")
+      res+="onfocus='"+onFocus+"' ";
+	if (onBlur!="")
+	  res+="onblur='"+onBlur+"' "; 	
+  }
+  if (siguiente!="")
+    res+="onkeypress='javascript:pasarFoco ("+siguiente+"); "+onKeyPress+"' ";
+  else
+    if (onKeyPress!="")
+      res+="onkeypress='"+onKeyPress+"' ";
+  return res;
+}
+/*
+Esta función genera los elementos de un combo
+El arreglo tiene que ser un arreglo de arreglos
+En seleccionado recibe el identificador no el valor
+*/
+function ElementosCombo (arreglo, seleccionado, limite, indice_id, indice_valor)
+{
+  var nelementos=arreglo.length;
+  var i;
+  var selected;
+  var elemento;
+  var valor;
+  var res="";
+  if (nelementos>0)
+  {
+	for (i=0; i<nelementos; i++)
+	{
+	  selected="";
+	  elemento=arreglo[i];
+	  if (seleccionado==elemento[indice_id])
+		selected="selected='selected'";
+	  valor=elemento[indice_valor];
+	  if (limite>0)
+	    valor=valor.substring(0,limite);
+	  res+="<option "+selected+" value='"+elemento[indice_id]+"'>"+valor+"</option>";
+	}	  	
+  }
+  else
+	  res+="<option value='NULL'>No hay datos</option>";
+  return res;
+}
+/*
+Esta función dibuja un combo
+*/
+//combo pasajes
+function Combo(arreglo, seleccionado, nombreCombo, editar, extra, limite, siguiente, indice_id, indice_valor, onFocus, onBlur, onKeyPress)
+{
+    var res = "";
+    var eventos;
+    if (editar)
+    {
+        eventos = generarEvento(siguiente, onFocus, onBlur, onKeyPress);
+
+        if (document.getElementById('codigoProcesoPasajes'))
+        {
+            var codigo = document.getElementById('codigoProcesoPasajes').value;
+            if (codigo == '148' || codigo == '149')
+            {
+                res = "<select onchange='ultimoCombo()' name='" + nombreCombo + "' id='" + nombreCombo + "' " + extra + " " + eventos + ">";
+                res += ElementosCombo(arreglo, seleccionado, limite, indice_id, indice_valor);
+                res += "</select>";
+            } else
+            {
+                res = "<select name='" + nombreCombo + "' id='" + nombreCombo + "' " + extra + " " + eventos + ">";
+                res += ElementosCombo(arreglo, seleccionado, limite, indice_id, indice_valor);
+                res += "</select>";
+            }
+        } else
+        {
+            res = "<select name='" + nombreCombo + "' id='" + nombreCombo + "' " + extra + " " + eventos + ">";
+            res += ElementosCombo(arreglo, seleccionado, limite, indice_id, indice_valor);
+            res += "</select>";
+        }
+    } else
+    {
+        res = Label(nombreCombo, buscarArreglo(arreglo, seleccionado, indice_id, indice_valor), "text", limite, 0);
+    }
+    return res;
+}
+/*
+Esta función dibuja un label en un div
+*/
+//dibuja pasajes
+function dibujarCombo (nombreDiv, arreglo, seleccionado, nombreCombo, editar, extra, limite, siguiente, indice_id, indice_valor, onFocus, onBlur, onKeyPress)
+{   
+  var res=Combo (arreglo, seleccionado, nombreCombo, editar, extra, limite, siguiente, indice_id, indice_valor, onFocus, onBlur, onKeyPress);
+  asignarValorDiv (nombreDiv, res);
+}
+/*
+Esta función genera un option buton
+*/
+function CajaOpcion (nombre, valor, valorActual, editable, adicional, siguiente, onFocus, onBlur, onKeyPress)
+{
+  var res="";
+  var eventos;
+  var extra;
+  if (editable)
+  {
+    eventos=generarEvento (siguiente, onFocus, onBlur, onKeyPress);
+	if (valor==valorActual)
+	  extra="checked='checked'";
+	else
+	  extra="";
+	res+="<input id='"+nombre+valor+"' ";
+	res+="name='"+nombre+"' ";
+	res+="type='radio' ";
+	res+="value='"+valor+"' ";
+	res+=extra;
+	res+=adicional;
+	res+=" "+eventos+"/>";
+  }
+  else
+  {
+    if (valor==valorActual)
+	  res+="<img src='/ProcesoContratacion/app/webroot/compras/img/marca1.gif' alt='Checked' width='17' height='17' />";
+	else
+	  res+="<img src='/ProcesoContratacion/app/webroot/compras/img/sinmarca1.gif' alt='unchecked' width='17' height='17' />";
+  }	
+  return res;
+}
+/*
+Para actualizar con ajax
+*/
+function CajaOpcionArr (nombre, valor, valorActual, editable, adicional, siguiente, onFocus, onBlur, onKeyPress, id_invitacion)
+{
+  var res="";
+  var eventos;
+  var extra;
+  if (editable)
+  {
+    eventos=generarEvento (siguiente, onFocus, onBlur, onKeyPress);
+	if (valor==valorActual)
+	  extra="checked='checked'";
+	else
+	  extra="";
+	res+="<input id='"+nombre+"["+id_invitacion+"]' ";
+	res+="name='"+nombre+"["+id_invitacion+"]' ";
+	res+="type='radio' ";
+	res+="value='"+valor+"' ";
+	res+=extra;
+	res+=adicional;
+	res+=" "+eventos+"/>";
+  }
+  else
+  {
+    if (valor==valorActual)
+	  res+="<img src='/ProcesoContratacion/app/webroot/compras/img/marca1.gif' alt='Checked' width='17' height='17' />";
+	else
+	  res+="<img src='/ProcesoContratacion/app/webroot/compras/img/sinmarca1.gif' alt='unchecked' width='17' height='17' />";
+  }	
+  return res;
+}
+/*
+Esta función dibuja un opcion en un div
+*/
+function dibujarOpcion (nombreDiv, nombre, valor, valorActual, editable, adicional, siguiente, onFocus, onBlur, onKeyPress)
+{   
+  var res=CajaOpcion (nombre, valor, valorActual, editable, adicional, siguiente, onFocus, onBlur, onKeyPress);
+  asignarValorDiv (nombreDiv, res);
+}
+
+function calcularAlto(nombreIFrame)
+{
+  //find the height of the internal page
+  var alto=
+    document.getElementById(nombreIFrame).contentWindow.
+      document.body.scrollHeight;
+
+  //change the height of the iframe
+  document.getElementById(nombreIFrame).height=alto;
+}
+
+function ocultarDiv(nombreDiv) 
+{	
+  document.getElementById(nombreDiv).style.visibility = 'hidden'; 
+} 
+
+function mostrarDiv(nombreDiv) 
+{ 
+  document.getElementById(nombreDiv).style.visibility = 'visible'; 
+} 
+

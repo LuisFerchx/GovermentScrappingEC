@@ -1,0 +1,117 @@
+/*
+Tipo de letra del portal
+*/
+/*body{
+    font-family: "Tahoma", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}*/
+
+/*PRINCIPAL INSTITUCIONES
+=================================================*/
+#main.institucion .color.fucsia{border-color: #005DA6} /*se cambia el fucsia por azul de3176 -> 005DA6*/
+#main.institucion .color.azul{border-color: #005DA6} /*se cambia el código de azul 019be2 -> 005DA6*/
+#main.institucion .full.azul{
+    background: #005DA6; /*se cambia el código de azul 019be2 -> 005DA6*/
+    color: #FFF
+}
+
+/*PRINCIPAL SIMPLES
+=================================================*/
+#main.single .color.fucsia{border-color: #005DA6} /*se cambia el fucsia por azul*/
+#main.single .color.azul{border-color: #005DA6} /*se cambia el código de azul*/
+#main.single .full.azul{
+    background: #005DA6; /*se cambia el código de azul 019be2 -> 005DA6*/
+    color: #FFF
+}
+
+/* FOOTER ----> ID: FOOTER-BOT
+
+Se reemplazó la imagen de footer colores.png
+================================================== */
+/*footer#footer-bot .container-fluid,
+.sidebar{
+    background-image: url(../img/colores.png) !important; 
+
+}*/
+
+/* 
+CSS que corrige alineación de imagenes que se insertan en entradas y páginas
+====================================================*/
+
+/*INICIO CSS CORRECCIÓN*/
+
+/* Captions */
+.aligncenter,
+div.aligncenter {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+ 
+.wp-caption {
+	border: 1px solid #ddd;
+	text-align: center;
+	background-color: #f3f3f3;
+	padding-top: 4px;
+	margin: 10px;
+	-moz-border-radius: 3px;
+	-khtml-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+}
+ 
+.wp-caption img {
+	margin: 0;
+	padding: 0;
+	border: 0 none;
+}
+ 
+.wp-caption p.wp-caption-text {
+	font-size: 11px;
+	line-height: 17px;
+	padding: 0 4px 5px;
+	margin: 0;
+}
+/* End captions */
+ 
+/* Begin Images */
+p img {
+	padding: 0;
+	max-width: 100%;
+	}
+ 
+/*	Using 'class="alignright"' on an image will (who would've
+	thought?!) align the image to the right. And using 'class="centered',
+	will of course center the image. This is much better than using
+	align="center", being much more futureproof (and valid) */
+ 
+img.centered {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	}
+ 
+img.alignright {
+	padding: 4px;
+	margin: 0 0 2px 7px;
+	display: inline;
+	}
+ 
+img.alignleft {
+	padding: 4px;
+	margin: 0 7px 2px 0;
+	display: inline;
+	}
+ 
+.alignright {
+	float: right;
+	}
+ 
+.alignleft {
+	float: left;
+	}
+/* End Images */
+
+/*FIN CSS CORRECCIÓN*/
+
+
+

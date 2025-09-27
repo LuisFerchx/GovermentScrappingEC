@@ -1,0 +1,192 @@
+#cuerpo h2 {
+    margin-bottom: 0;
+}
+
+.form-control {
+    height: 30px;
+    font-size: 11px;
+}
+
+.tooltip-soce:hover .tooltip-info {
+    visibility: visible;
+}
+
+.tooltip-info {
+    visibility: hidden;
+    width: 100%;
+    margin-top: 35px;
+    background-color: #021c51;
+    color: #fff;
+    border-radius: .2rem;
+    text-align: justify;
+    padding: 10px;
+    opacity: 0.8;
+    position: absolute;
+    z-index: 1;
+}
+
+.multiline-text {
+    word-break: break-word;
+}
+
+#itemAdd {
+    float: right;
+    margin-top: 10px;
+}
+
+.buttons a {
+    float: none !important;
+    display: inline-block !important;
+}
+
+#suggesstion-box2 {
+    max-height: 100px;
+    overflow: scroll;
+    position: fixed;
+    margin-right: 21px;
+}
+
+#suggesstion-box2 .list-group li{
+    padding: .3rem .4rem;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+#suggesstion-box {
+    max-height: 180px;
+    overflow: scroll;
+    position: fixed;
+    margin-right: 21px;
+}
+
+#suggesstion-box .list-group li{
+    padding: .3rem .4rem;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+#item .table td, #item .table th{
+    border-top: none;
+}
+
+/* DATATABLE*/
+#table_id_filter input {
+    display: inline;
+    width: initial;
+}
+
+table.dataTable tfoot th {
+    padding: 10px 4px 6px 4px;
+}
+
+table tr td a {
+    text-decoration: none;
+    color: #064980;
+}
+table.dataTable thead th,
+table.dataTable thead td {
+    border-bottom: 2px solid #dee2e6;
+    border-top: 1px solid #dee2e6;
+}
+table.dataTable tfoot th,
+table.dataTable tfoot td {
+    border-top: 1px solid #dee2e6;
+}
+
+.dataTables_wrapper {
+    font-size: 11px;
+}
+
+#overDiv table {
+    margin-bottom: 0px!important;
+}
+
+#overDiv table tr td table:first-child td {
+    padding: 5px;
+    background-color: #1D1060;
+} 
+
+#overDiv table tr td table:last-child td {
+    padding: 5px;
+    background-color: #dddddd;
+} 
+
+/* Buscador principal ciudadanía */
+header#head {
+    background-image: url(https://portal.compraspublicas.gob.ec/sercop/wp-content/themes/Sitio-32/oraculo/imagen_header/107.jpg);
+}
+
+#infima #content {
+    background-color: #fff;
+}
+
+#infima #head,
+#infima #head #nomobile {
+    height: 205px;
+}
+
+#infima #head #logo {
+    margin: 30px 0 37px 0;
+}
+
+#infima #head .leyenda-header {
+    float: right;
+    margin-top: 116px;
+}
+
+#infima #head .leyenda-header img {
+    height: 25px;
+}
+
+#infima .dataTables_wrapper .dataTable {
+    font-size: 13px;
+}
+
+#infima #main.institucion .color {
+    padding-top: 0;
+}
+
+#infima #main h1{
+    font-size: 36px;
+}
+
+#infima #main .breadcrumb {
+    width: 100%;
+    background-color: #f5f5f5;
+}
+
+#infima #main .breadcrumb a {
+    color: #337ab7;
+}
+
+#infima #main h2 {
+    font-size: 16px;
+}
+
+#infima #main i {
+    width: 18px;
+}
+
+#infima #main .funcionario-container {
+    border-left: 1px solid #CCC;
+    padding-left: 15px;
+}
+
+#infima .buttons {
+    width: 100%;
+}
+
+#infima .alert p {
+    margin-bottom: 0;
+}
+
+#footer-bot a {
+    font-size: 14px;
+}
+
+
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}

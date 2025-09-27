@@ -1,0 +1,89 @@
+body {
+    color: #333;
+    padding: 0 30px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 76%;
+}
+
+.panel {
+    clear: both;
+    display: none;
+    border: 3px solid #CCC;
+    padding: 1em;
+}
+.panel.active-tab-body {
+    display: block;
+}
+#tabs {
+    list-style: none;
+}
+
+#tabs li {
+    float: left;
+}
+
+#tabs a {
+    float: left;
+    padding: 5px 8px;
+    margin-left: 6px;
+    background-color: #F2F2F2;
+    text-decoration: none;
+    color: #999999;
+}
+
+#tabs a.active-tab {
+    background-color: #CCC;
+    border-top: 3px solid #999;
+    padding-top: 3px;
+    color: #000;
+}
+input.disabled {
+    border: 1px solid #F2F2F2;
+    background-color: #F2F2F2;
+}
+
+input.validation-failed, textarea.validation-failed {
+    border: 1px solid #D8000C;
+}
+input.validation-passed, textarea.validation-passed {
+    border: 1px solid #4F8A10;
+    color : #000;
+}
+
+.validation-advice {
+    margin: 5px 0;
+    padding: 3px 5px;
+    background-color: #F5E1E0;
+    color : #CC0033;
+    font-weight: bold;
+    width: 100%;
+}
+
+.custom-advice {
+    margin: 5px 0;
+    padding: 5px;
+    background-color: #C8AA00;
+    color : #FFF;
+    font-weight: bold;
+}
+
+fieldset {
+    padding: 1em;
+    margin-bottom: 0.5em;
+}
+
+label {
+    font-weight: bold;
+}
+.form-row {
+    clear: both;
+    padding: 0.5em;
+}
+
+.field-label {
+
+}
+
+.field-widget {
+
+}

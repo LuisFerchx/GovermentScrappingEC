@@ -1,0 +1,74 @@
+# Entorno virtual
+venv/
+env/
+ENV/
+
+# Archivos de Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Archivos de salida del programa
+*.xlsx
+*.xls
+*.csv
+
+# Archivos de configuración con datos sensibles
+config.py
+.env
+
+# Archivos de debug
+debug_files/
+*.html
+*.log
+
+# Archivos temporales
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ChromeDriver
+chromedriver.exe
+chromedriver
+*.exe
+
+# Archivos de Selenium
+geckodriver.log
+selenium-debug.log
+
+# Archivos de API keys
+api_keys.txt
+secrets.txt
+
+# Archivos de datos extraídos
+data/
+output/
+results/
+
+# Archivos de backup
+*.bak
+*.backup

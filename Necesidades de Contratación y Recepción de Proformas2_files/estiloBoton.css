@@ -1,0 +1,224 @@
+/* 
+    Document   : estiloBoton
+    Created on : 26-feb-2010, 13:22:50
+    Author     : aguerrero
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+/* 
+   TODO customize this sample style
+   Syntax recommendation http://www.w3.org/TR/REC-CSS2/
+*/
+/*
+.miboton {
+            padding: 4px 10px 3px 25px;
+            border: solid 1px #8AB134;
+            position: relative;
+            cursor: pointer;
+            display: inline-block;
+            background-image: url( '../img/bkg.png' );
+            background-repeat: repeat-x;
+            font-size: 11px;
+            height: 16px;
+            text-decoration: none;
+            color: #40740D;
+            -moz-border-radius-bottomleft: 5px;
+            -moz-border-radius-bottomright: 5px;
+            -moz-border-radius-topleft: 5px;
+            -moz-border-radius-topright: 5px;
+        }
+.miboton img {
+            position: absolute;
+            top: -4px;
+            left: -12px;
+            border: none;
+        }
+.miboton:hover {
+            color: #339;
+	background-image: url( '../img/bkg2.jpg' );
+        }
+*/
+/* BUTTONS */
+
+.buttons a, .buttons button{
+    display:block;
+    float:left;
+    margin:0 7px 0 0;
+    background-color:#1D1060; /*f5f5f5*/
+    border:1px solid #dedede;
+    border-top:1px solid #eee;
+    border-left:1px solid #eee;
+    font-family:"Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
+    font-size: 11px;
+    line-height:130%;
+    text-decoration:none;
+    font-weight:bold;
+    color:#ffffff; /*565656*/
+    cursor:pointer;
+    padding:5px 10px 6px 7px; /* Links */
+    text-align: center;
+}
+.buttons button2{
+    width:auto;
+    overflow:visible;
+    padding:4px 10px 3px 7px; /* IE6 */
+}
+.buttons button[type]{
+    padding:5px 10px 5px 7px; /* Firefox */
+    line-height:17px; /* Safari */
+}
+*:first-child+html button[type]{
+    padding:4px 10px 3px 7px; /* IE7 */
+}
+.buttons button img, .buttons a img{
+    margin:0 3px -3px 0 !important;
+    padding:0;
+    border:none;
+    width:16px;
+    height:16px;
+}
+/* STANDARD */
+
+button:hover, .buttons a:hover{
+    background-color:#dff4ff;
+    border:1px solid #c2e1ef;
+    color:#336699;
+}
+.buttons a:active{
+    background-color:#6299c5;
+    border:1px solid #6299c5;
+    color:#fff;
+}
+
+/* POSITIVE */
+
+button.positive, .buttons a.positive{
+    color:#fff;
+}
+.buttons a.positive:hover, button.positive:hover{
+    background-color:#dff4ff; /* #E6EFC2 */
+    border:1px solid #c2e1ef; /* #C6D880 */
+    color:#529214;
+}
+.buttons a.positive:active{
+    background-color:#529214; /*529214*/
+    border:1px solid #529214;
+    color:#fff;
+}
+
+/* NEGATIVE */
+
+.buttons a.negative, button.negative{
+    color:#fff;
+}
+.buttons a.negative:hover, button.negative:hover{
+    background:#fbe3e4;
+    border:1px solid #fbc2c4;
+    color:#d12f19;
+}
+.buttons a.negative:active{
+    background-color:#d12f19;
+    border:1px solid #d12f19;
+    color:#fff;
+}
+
+.buttonAzul{
+    background: #021c51 none repeat scroll 0 0;
+    border-radius: 4px;
+    color: #fff;
+    font-family: Arial,Helvetica,sans-serif;
+    font-weight: bold;
+    height: 23px;
+    border: 1px solid #888;
+    cursor: pointer;
+}
+
+.buttonAzul:hover{
+    background: #046FAB none repeat scroll 0 0;
+}
+
+#imgAddCert{
+    color: #021c51; 
+    cursor: pointer;
+}
+
+#imgAddCert:hover{
+    color: #046FAB; 
+    
+}
+
+.circleButton{
+    color: #B20000; 
+    cursor: pointer;
+}
+
+.circleButton:hover{
+    color: #FF5656; 
+    
+}
+
+/* Tooltip container */
+.tooltip {
+    position: relative;
+    display: inline-block;
+    
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 240px;
+    background-color: #021c51;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+    text-align: justify;
+    padding: 10px;
+    opacity: 0.8;
+    /* Position the tooltip text - see examples below! */
+    position: absolute;
+    z-index: 1;
+}
+
+/* Tooltip container */
+.tooltip2 {
+    position: relative;
+    display: inline-block;
+    
+}
+
+/* Tooltip text */
+.tooltip2 .tooltiptext2 {
+    visibility: hidden;
+    width: 500px;
+    background-color: #021c51;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+    text-align: justify;
+    padding: 10px;
+    opacity: 0.8;
+    /* Position the tooltip text - see examples below! */
+    position: absolute;
+    z-index: 1;
+    font-weight: normal;
+    font-size: 12px;
+    bottom: 100%; 
+    left: 70%; 
+    margin-left: -250px; 
+    border-width: 2px; 
+    border-style: solid;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip2:hover .tooltiptext2 {
+    visibility: visible;
+}

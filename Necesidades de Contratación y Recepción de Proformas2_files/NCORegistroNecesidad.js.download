@@ -1,0 +1,464 @@
+var v_editar=true;
+var idProceso;
+
+function dibujarCaton(idProvincia)
+{
+    arrCantonesDibujar=generarArregloBuscar (arrCantones, idProvincia, 2, "","","");
+    dibujarCombo ("divCanton", arrCantonesDibujar, v_idCanton, "cmbCanton", v_editar, "class='form-control required' onchange='dibujarParroquia(this.value)'", 0, "", 0, 1, "", "", "");		
+    dibujarParroquia($("cmbCanton").value);		
+}
+
+function dibujarParroquia(idCanton)
+{
+    arrParroquiasDibujar=generarArregloBuscar (arrParroquias, idCanton, 2, "0","","");	
+    dibujarCombo ("divParroquia", arrParroquiasDibujar, v_idParroquia, "cmbParroquia", v_editar, "class='form-control required'", 0, "", 0, 1, "", "", "");	    
+}
+
+function regresarp(id){
+    window.location.href = "/ProcesoContratacion/compras/NCO/FrmNCORegistroPaso1.cpe?id=" + id;
+}
+
+function registrarItems() {
+    
+    idTipoProceso = $('txtBusSolCompraSeqtipotab').value;
+    emailEncargado = $('emailEncargado').value;
+    idResolucion   = $('numResolucionEmg').value;
+    descripcionEmg = $('descripcionEmg').value;
+    idProvincia   = $('cmbProvincia').value;
+    direccionEntrega = $('direccionEntrega').value;
+    
+    emailEncargado = $('emailEncargado').value;
+    celularEncargado  = $('celularEncargado').value;
+    telefonoEncargado = $('telefonoEncargado').value;
+    funcionarioEncargado = $('funcionarioEncargado').value;
+    
+    if(idTipoProceso !== '' && idResolucion !== '' && descripcionEmg !== '' && idProvincia !== '' &&  direccionEntrega !== '' && emailEncargado !== '' && celularEncargado !== ''
+            && celularEncargado !== '' && funcionarioEncargado !== '') {
+        if (confirm('¿Seguro que desea guardar los datos ingresados?')) {
+           document.getElementById('emgRegistroForm').submit();
+        }        
+    } else {
+        alert('Todos los campos son obligatorios. Por favor revise los datos ingresados');
+    }
+    
+    
+}
+
+function nDecimales(n) { let t=n.toString(); let regex=/(\d*.\d{0,2})/; return t.match(regex)[0]; } 
+
+function calcularSubtotal() {
+        
+    let cantidad = document.getElementById('cantidad').value;
+    let precio = document.getElementById('precioUnitario').value;
+    let subtotal = 0.0;
+    
+    if (parseFloat(cantidad) >= 0 && parseFloat(precio) >= 0 ) {
+        subtotal = parseFloat(cantidad) * parseFloat(precio);        
+        let subT = subtotal.toFixed(6).toString();
+        document.getElementById('subtotal').value =  subT;
+    } else {
+        document.getElementById('subtotal').value =  '';
+    }
+}
+
+function filterFloat(evt,input,numdecimal){
+    var key = window.Event ? evt.which : evt.keyCode;    
+    var chark = String.fromCharCode(key);
+    var tempValue = input.value+chark;
+    if (key >= 48 && key <= 57) {
+        if(filter(tempValue,numdecimal)=== false) {
+            return false;
+        } else {       
+            return true;
+        }
+    } else {
+        if(key == 8 || key == 13 || key == 0) {     
+            return true;              
+        } else if(key == 46) {
+            if (filter(tempValue,numdecimal) === false) {
+                return false;
+            }else{       
+                return true;
+            }
+        } else {
+              return false;
+        }
+    }
+}
+
+function filter(__val__,numdecimal){
+    if (numdecimal == 2) {
+        var preg = /^([0-9]+\.?[0-9]{0,2})$/; 
+    }
+    if (numdecimal == 3) {
+        var preg = /^([0-9]+\.?[0-9]{0,3})$/; 
+    }
+    if (numdecimal == 4) {
+        var preg = /^([0-9]+\.?[0-9]{0,4})$/; 
+    }
+    if (numdecimal == 5) {
+        var preg = /^([0-9]+\.?[0-9]{0,5})$/; 
+    }
+    if (numdecimal >= 6) {
+        var preg = /^([0-9]+\.?[0-9]{0,6})$/; 
+    }
+
+    if (preg.test(__val__) === true) {
+        return true;
+    } else {
+       return false;
+    }    
+}
+
+function respuestaProcesoItem(result) { 
+    if (result.estado) {
+        window.location.href = "/ProcesoContratacion/compras/NCO/FrmNCORegistroPaso2.cpe?id=" + result.id;
+    } else {
+        $('mensaje').innerHTML = "<div class='error'><p>Error al actualizar información. Revise la información ingresada.</p></div>";
+    }
+}
+
+function eliminarDetalleNecesidad(id,necesidadID) {
+    if (confirm('¿Está seguro que desea eliminar el registro?')) {
+        ajax_controller('id=' + id + '&necesidadId=' + necesidadID, 'ClaseNCONecesidadDetalle', 'eliminarItem', respuestaProcesoItem);
+    }
+}
+
+function buscarCPC() {
+    $('idProducto').value = '';
+    var texto = $('cpcFilter').value;
+    var data = '&buscarCpc=' + texto;
+    if (texto == ""){
+        alert("Debe ingresar una palabra clave o código CPC(a 5 dígitos) y presionar el botón 'Buscar'.");
+    }else if (texto.length >= 5) {
+        ajax_controller (data, 'ClaseNCONecesidadDetalle', 'buscarCPC',respuestaCPC);
+    } else {
+        alert("Debe ingresar por lo menos 5 caracteres para realizar la búsqueda.");
+    }
+}
+
+function respuestaCPC(result) {
+    var html = '';
+    var id_prod_str = '';
+    if (result.length > 0) {
+        html += '<ul class="list-group">';
+        for (var i = 0; i < result.length; i++) {
+            let cod_cl_inter = result[i].codigo_cl_inter;
+            if (cod_cl_inter.startsWith("0")) {
+                let id_prod = result[i].id_producto;
+                id_prod_str = "0" + id_prod.toString();
+            } else {
+                id_prod_str = result[i].id_producto;
+            }
+            html += '<li id="' + result[i].id_producto + '" class="list-group-item ';
+            html += i % 2 == 1 ? 'list-group-item-secondary"' : '"';
+            html += 'onClick="seleccionarCPC(\'' + result[i].id_producto + '\',\'' + id_prod_str + '\');">';
+            html += id_prod_str + ': ' + result[i].desc_producto;
+            html += '</li>';
+        }
+        html += '</ul">';
+        let suggesstion = document.getElementById("suggesstion-box");
+        suggesstion.removeAttribute("hidden");
+    
+        $('suggesstion-box').update(html);
+        $('suggesstion-box').show(); 
+    } else {
+        alert("No se encontraron resultados por favor intente nuevamente.")
+        $('cpcFilter').value = "";
+        $('suggesstion-box').hide();
+        $('suggesstion-box').update('');
+    }      
+}
+
+function seleccionarCPC(cpc,cpcStr) {
+    $('idProducto').value = cpc;
+    $('idProductoStr').value = cpcStr;
+    $('cpcFilter').value = $(cpc).innerHTML;
+    $('suggesstion-box').hide();
+    $('suggesstion-box').update('');
+}
+
+function finalizaRegistro(id) {
+    idProceso = id;
+    let valid = new Validation('respuestaForm', {onSubmit:false,checkInvisible: true});
+    Validation.addAllThese([
+        ['validate-check-ta', 'Debe aceptar los términos y condiciones.', function(v){
+            return !Validation.get('IsEmpty').test(v)
+        }],
+        ['validate-forma-pago','Solo se permiten los siguientes caracteres especiales: ():;.-_*%', function(){
+            return validateCaracterFormaPago($('formaPago').getValue(), 300);
+        }],
+    ]);
+    let result = valid.validate();
+    if(result){
+        ajax_controller('id=' + id, 'ClaseNCONecesidadContratacion', 'verificarFechaPublicacion', respuestaFechaPublicacion);
+    }
+}
+
+function respuestaFechaPublicacion(res) {
+    varSeqTipo = $('seqTipo').value;
+    let arrayTiposArchivos = new Array("54091, 54080"); //Archivos obligatorios en Necesidades de Contratación
+    let cont   = 0;
+    let a      = arrayTiposArchivos[0];
+    let data   = "seqtipoArchivo="+a+"&idRelaciona="+res.id;
+    let clazz  = "ClaseGENArchivoControl";
+    let action = "validarNumArchivosxTipoNC";
+    ajax_call (data, clazz, action, function (result, resp) {
+        resultadoValidacion = result['respuesta'];
+        if (resultadoValidacion == 'n'){
+           cont =+ 1;
+           alert('Debe subir por lo menos un archivo por cada documento obligatorio.');
+        }
+    });
+    if (res.estado === 1 ) {
+        if( cont == 0){
+            if (confirm('¿Está seguro de finalizar el registro?')) {
+                ajax_controller($('respuestaForm').serialize(), 'ClaseNCONecesidadContratacion', 'finalizarRegistro', respuestaFinalizarRegistro);
+            }
+        }
+    } else {
+        if (varSeqTipo == 54089) {
+            alert('Su necesidad de contratación no puede ser publicada. La fecha de publicación ingresada en el paso 1 no puede ser anterior a la fecha actual.');
+        } else {
+            alert('Su necesidad de ínfima cuantía no puede ser publicada. La fecha de publicación ingresada en el paso 1 no puede ser anterior a la fecha actual.');
+        }
+    }
+}
+
+function respuestaFinalizarRegistro(result){
+    if(result) {
+        $('id').value     = idProceso;
+        $('opcion').value = 'Finalizar';
+        $('respuestaForm').submit();
+    } else {
+        alert('Error al finalizar el registro, favor intente nuevamente.');
+    }
+}
+
+function soloNumeros(e){
+    var key = window.event ? e.which : e.keyCode;
+    if (key < 48 || key > 57) {
+        e.preventDefault();
+    }
+}
+
+function soloNumerosPunto(e){
+    var key = window.event ? e.which : e.keyCode;
+    if(key == 46) {
+        return;
+    }
+    if (key < 48 || key > 57) {
+        e.preventDefault();
+    }
+}
+
+function btnRegresarPaso2(){
+    $('opcion').value='Regresar';
+    $('respuestaForm').submit();
+}
+
+function btnActualizar(transid)
+{    
+    $('opcion').value='Actualizar';
+    $('transid').value=transid;
+    $('respuestaForm').submit();
+}
+
+//Contar caracteres
+function contarCaracteres(input){
+    $(input.id + '_contador').value = input.value.length;
+}
+
+function showSpinner() {
+    document.getElementById('spinner').style.display = '';
+}
+
+function hideSpinner() {
+    document.getElementById('spinner').style.display = 'none';
+}
+
+function buscarDescripcionProducto() {    
+    let texto = $('descripcionItem').value;
+    let varIdProducto = $('idProducto').value;
+    var varTipoProceso = $('varSeqTipoNecsidad').value;
+
+    if (varIdProducto==""){
+        alert("Debe ingresar una palabra clave o código CPC(a 5 digitos).");
+    } else {
+        var data = 'buscarDescripcionProd=' + texto + '&varTipoProceso=' + varTipoProceso + '&varIdProducto='+varIdProducto;
+        showSpinner();
+        if (texto == "" || texto.length < 5) {
+            alert("Debe ingresar por lo menos 5 caracteres para realizar la busqueda.");
+            hideSpinner();
+        }else if( texto.length >= 5 ) {
+            ajax_controller ( data, 'ClaseNCONecesidadDetalle', 'buscarDescripcionProductos',respuestaDescripcionProducto);
+            hideSpinner();
+        }
+    }
+}
+
+function respuestaDescripcionProducto(result) {
+    var html = '';
+    hideSpinner();
+    if (result.length > 0) {
+        html += '<ul class="list-group">';
+        for (var i = 0; i < result.length; i++) {
+            html += '<li id="' + result[i].tcom_necesidad_detalle_id + '" class="list-group-item ';
+            html += i % 2 == 1 ? 'list-group-item-secondary"' : '"';
+            html += 'onClick="seleccionarDescripcionProducto(\'' + result[i].descripcion + '\');">';
+            html += result[i].descripcion;
+            html += '</li>';
+        }
+        html += '</ul">';
+
+        let suggesstion2 = document.getElementById("suggesstion-box2");
+        suggesstion2.removeAttribute("hidden");
+    
+        $('suggesstion-box2').update(html);
+        $('suggesstion-box2').show();
+    } else {
+        alert("No se ha encontrado resultados, ingrese directamente la descripción de su producto.");
+        $('suggesstion-box2').hide();
+        $('suggesstion-box2').update('');
+    }
+}
+
+function seleccionarDescripcionProducto(descripcionProducto){
+    $('descripcionItem').value = descripcionProducto;
+    $('suggesstion-box2').hide();
+    $('suggesstion-box2').update('');
+    
+    let height = 0;
+    let textArea = document.getElementById("descripcionItem");
+    height =  textArea.scrollHeight + 10;
+    textArea.style.height = height + "px";
+    $('descripcionItem').show();
+}
+
+function validarNombreArchivo(){    
+    urlDocumento = document.getElementById("archivo").value;
+    
+    if (urlDocumento === '') {
+        alert("Ingrese el documento");
+    } else {
+        nombreArchivo = urlDocumento.substr(urlDocumento.lastIndexOf("\\") + 1);                   
+        if(validarExtensionesPermitidas(nombreArchivo) && validarNombre(nombreArchivo)){
+            ProcesarArchivo(nombreArchivo);
+        }
+    }
+
+}
+
+function validarExtensionesPermitidas(nombreArchivo){
+    var validaExtensiones = true;
+    var extensionesValid = new Array(".xls");
+    var extension = nombreArchivo.substring(nombreArchivo.lastIndexOf('.'));
+    if (extensionesValid.indexOf(extension) < 0) {
+        alert("Solo permite subir archivos con extensiones: " + (extensionesValid.join(" ")));
+        validaExtensiones = false;
+    } else {
+        validaExtensiones = true;
+    }
+    return validaExtensiones;
+}
+
+function validarNombre(nombreArchivo){
+    var validaNombre = true;
+    nombreSinExtension= nombreArchivo.substr(0,nombreArchivo.lastIndexOf(".")); 
+
+    if (/^([a-zA-Z0-9\s_-])/.test(nombreSinExtension)){
+        validaNombre = true;
+    } else {
+        validaNombre = false;
+        alert("El nombre del archivo no debe contener tíldes ni caracteres extraños");   
+    } 
+    return validaNombre;
+}
+
+function ProcesarArchivo(nombreArchivo) {
+    cargando();
+    var frm = $('frmsubirXML');
+    frm.submit(function (e) {
+        e.preventDefault();
+        $.ajax({
+            type: frm.attr('method'),
+            url: frm.attr('action'),
+            data: frm.serialize(),
+            success: function (data) {
+                $('modal_subir_excel').html(data);
+            },
+            error: function (data) {
+                console.log('An error occurred.');
+                console.log(data);
+            },
+        }).done(function(response){ 
+            $('modal_subir_excel').html(response);
+        });
+        $('frmsubirXML')[0].reset();
+        return false;
+    });
+}
+
+function submitForm(e){
+    jQuery( "frmsubirXML" ).on( 'click',function() {
+        console.log('aaaaa');
+    });
+}
+
+function cargando(){
+    var elem = document.getElementById("myBar");   
+    var width = 1;
+    var id = setInterval(frame, 10);
+    function frame() {
+      if (width >= 100) {
+        clearInterval(id);
+      } else {
+        width++; 
+        elem.style.width = width + '%'; 
+      }
+    }
+}
+
+function validateCaracterFormaPago(campo) {
+    var largo = campo.length;
+    var i;
+    var ch;
+    
+    for (i=0;i<largo;i++) {
+        ch=campo.substr(i,1);
+        if (!(ch>='a'&&ch<='z'||ch>='A'&&ch<='Z' ||ch>='0'&&ch<='9' || ch==' ' || ch=='-' || ch==':' 
+                || ch==';' || ch=='(' || ch==')' ||ch=='.' ||ch==',' || ch=='%' || ch=='*' || ch=='_')){
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+function publicarArchivo(idProc) {   
+    idProceso = idProc;
+    let cont   = 0;
+    let a      = 54227;
+    let data   = "seqtipoArchivo="+a+"&idRelaciona="+idProceso;
+    let clazz  = "ClaseGENArchivoControl";
+    let action = "validarNumArchivosxTipoNC";
+    ajax_call (data, clazz, action, function (result, resp) {
+        resultadoValidacion = result['respuesta'];
+        if (resultadoValidacion == 'n'){
+           cont =+ 1;
+           alert('Debe subir por lo menos un archivo para publicar la orden de compra.');
+        }
+    });
+    
+    if( cont == 0){
+        if (confirm('¿Está seguro que desea realizar la publicación del archivo de Orden de Compra?\n Una vez que acepte el mismo no podrá ser modificado')) {
+            ajax_controller($('frmNCRegistroDetalle').serialize(), "ClaseNCONecesidadContratacion", "publicaArchivoOrden", respuestaPublicarArchivoOrden);
+        }
+    }
+}
+
+function respuestaPublicarArchivoOrden (result){
+    if (result === 1){
+        window.location.href = "/ProcesoContratacion/compras/NCO/NCORegistroDetalle.cpe?id=" + idProceso;
+    }   
+}

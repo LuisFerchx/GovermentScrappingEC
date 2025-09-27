@@ -1,0 +1,245 @@
+/* 
+    Created on : 11-nov-2020
+    Author     : Mario Morocho
+*/
+
+/* GENERAL */
+body.cuerpo {
+    margin: 12px;
+}
+div#contenedor {
+    padding: 15px 10px 10px;
+}
+.no-desbordar-400{
+    word-wrap: break-word;
+    max-width: 400px;
+}
+.tituloFondoClaro {
+    padding: 3px 5px;
+}
+div#contenedor .mensajes {
+    color: #003366;
+}
+div#contenedor .titxt {
+    color: #00468C;
+}
+
+/* Tablas */
+.tb-bottom {
+    border-bottom: 1px solid #dee2e6;
+}
+
+/* Enlaces */
+a.normal-link, a.page-link{
+    text-decoration: none;
+    color: #006;
+}
+a.normal-link i{
+    font-size: 12px;
+}
+#cuerpo a.btn{
+    text-decoration: none;
+}
+.bg-proceso-info {
+    background-color: #F1F1F1;
+    border: 1px solid #dee2e6;
+}
+
+/* MODAL */
+#MB_window{
+    top: 50%;
+    transform: translateY(-50%);
+}
+#MB_frame,#MB_window,#MB_content{
+    -webkit-border-radius: .3rem;
+    -moz-border-radius: .3rem;
+    border-radius: .3rem;
+    background-color: #fff;
+}
+#MB_header{
+    -webkit-border-radius: 3px 3px 0 0;
+    -moz-border-radius: 3px 3px 0 0;
+    border-radius: 3px 3px 0 0;
+    background-color: #f1f1f1;
+    border-bottom: 1px solid #dee2e6;
+}
+#MB_caption{
+    color: #4f4f4f;
+    padding: 10px 10px 7px;
+    font-size: 1em;
+}
+#MB_content{
+    color: #4f4f4f;
+    background-color: #fff;
+}
+h3.title-modal{
+    font-size: 12px;
+    margin: 5px 0 20px;
+    text-align: justify;
+    line-height: 1.3em;
+    word-wrap: break-word;
+}
+.button-model-container{
+    border-top: 1px solid #dee2e6;
+    padding: 15px 0 8px;
+}
+
+/* MENU */
+div.colorful{
+    display: none;
+}
+#tp-cssmenu li ul{
+    width: auto!important;
+}
+ul#user-data li{
+    max-width:320px!important;
+}
+
+/* ESTRUTURA*/
+#tabs-proceso a{
+    text-decoration: none;
+}
+#tabs-proceso .btn-light{
+    border-bottom: 1px solid #ddd;
+    background-color: #eee;
+}
+
+#tabs-proceso .active{
+    font-weight: bold;
+}
+
+#tabs-proceso .nav-tabs .nav-link{
+    border-top-color: lightgray;
+    border-left-color: lightgray;
+    border-right-color: lightgray;
+    border-top-left-radius: .4rem;
+    border-top-right-radius: .4rem;
+}
+
+#tabs-proceso .btn-light:hover{
+    border-bottom: 1px solid #ddd;
+    background-color: lightsteelblue;
+}
+
+#main-content{
+    border: 1px solid #ddd;
+    border-top: none;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    margin-top: 0px;
+    margin-bottom: 20px
+}
+#main-content.set-border-top {
+    border-top: 1px solid #ddd;
+    margin-top: 20px;
+}
+#main-content .resaltar{
+    background-color: #F1F1F1;
+}
+#main-content .bordeArriba{
+    font-size: 11px;
+    color: #4F4F4F;
+}
+#footer-form{
+    margin-bottom: 20px;
+}
+#tabmenu a:visited{
+    color: #2A1374;
+}
+#tabmenu a.active{
+    background-color: #efefef;
+}
+#content{
+    background-color: #efefef;
+}
+
+.fondoNormal table{
+    font-size: 11px!important;
+}
+.buttons a{
+    float: none!important;
+    display: inline-block!important;
+}
+.buttons a.d-none {
+    display: none!important;
+}
+
+/* CAPTCHA */
+#captchaBuscador #textoCaptcha{
+    display: inline;
+    width: 140px;
+    font-size: 12px;
+    margin: 5px 0 10px 0;
+}
+#captchaBuscador .linea-captcha{
+    display: inline-block;
+    border-top: 8px solid #1d1160;
+    padding-top: 2px;
+}
+#captchaBuscador .linea-captcha #captcha_img{
+    margin-left: -2px;
+}
+
+/* FORMULARIOS */
+.date-icon{
+    height: 31px!important;
+}
+
+#filter-table .form-control-sm,
+#cpaRegistroPaso2Form .btn,
+#myModalCPC .btn{
+    font-size: 12px;
+}
+
+#filter-table .date-icon{
+    height: 28px!important;
+}
+#buscar-cpc{
+    font-size: 14px;
+}
+
+#cpaRegistroPaso2Form .resaltar p.letrasPasos1{
+    padding-left: 12px;
+}
+
+#cpaAnexoForm table tr td,
+table.archivo tr td{
+    padding-left: 0;
+    padding-right: 0;
+}
+
+#divListarArchivos .table td,
+#divListarArchivos .table th{
+    padding: .2rem .4rem;
+    vertical-align: middle;
+}
+
+#cpaAnexoForm table tr td .letrasPasos1,
+table.archivo tr td .letrasPasos1{
+    padding-left: .75rem;
+}
+
+/* CALENDARIO */
+.calendar .nav{
+    display: table-cell;
+}
+
+.txtAzul {
+    color: #000099;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* TITULO IFRAME ARCHIVOS */
+.tituloArchivo {
+    color:#000066;
+    font-size:12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    background-color:#F1F3F5;
+}
+
+/* Administrador SOCE */
+.administrador-soce iframe {
+    border: none;
+}
