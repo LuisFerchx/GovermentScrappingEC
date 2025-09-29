@@ -184,6 +184,7 @@ python extract_table_data_pagination.py
 
 ## 📝 Notas Importantes
 
+- **Crear archivo .env**: Crear un archivo .env con la GEMINI_API_KEY ya que no va a estar en el codigo.
 - **Tiempo de ejecución**: Depende del número de páginas (aproximadamente 2-3 segundos por página)
 - **Conexión estable**: Se requiere conexión a Internet estable
 - **Recursos**: El programa usa Chrome en modo headless, consume memoria moderada

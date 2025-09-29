@@ -19,8 +19,13 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 import google.generativeai as genai
+from dotenv import load_dotenv
 
-GEMINI_API_KEY = "AIzaSyBAEB8s88fT27iszbPejZVa5Zq0pL_a9fQ"
+# Cargar variables de entorno desde .env si existe
+load_dotenv()
+
+# Leer clave desde variable de entorno
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 MODELO_IA = None
 try:
     if not GEMINI_API_KEY or "TU_CLAVE" in GEMINI_API_KEY:
@@ -653,9 +658,11 @@ def main():
     
     print("=== EXTRACTOR DE DATOS DE CONTRATACIÓN PÚBLICA CON PAGINACIÓN ===\n")
     
+    max_pages = int(os.getenv("MAX_PAGES", ""))
+    
     # STEP 1: Extract main data from all pages (without details)
     print("🔄 PASO 1: Extrayendo datos principales de todas las páginas...")
-    df = extract_all_pages_data(url, max_pages=50)  # Set max_pages=5 for testing
+    df = extract_all_pages_data(url, max_pages=max_pages)  # Set max_pages=5 for testing
     
     if df is None or df.empty:
         print("❌ No se pudieron extraer datos de la página web")
