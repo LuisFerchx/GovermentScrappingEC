@@ -59,7 +59,7 @@ pip install pandas beautifulsoup4 openpyxl lxml selenium webdriver-manager reque
 Edita el archivo `extract_table_data_pagination.py` y reemplaza la línea:
 
 ```python
-GEMINI_API_KEY = "AIzaSyBAEB8s88fT27iszbPejZVa5Zq0pL_a9fQ"
+GEMINI_API_KEY = "xxxxxxxxxxxxxxxxxxxxxx"
 ```
 
 Con tu propia API Key de Google Gemini:
