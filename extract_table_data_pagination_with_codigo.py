@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Script to extract table data from web URL with pagination support and export to Excel
+Enhanced version that includes código de necesidad de contratación extraction
 """
 
 import pandas as pd
@@ -53,6 +54,39 @@ def setup_driver():
     driver = webdriver.Chrome(service=service, options=chrome_options)
     return driver
 
+def extract_codigo_from_html_content(html_content):
+    """
+    Extrae el código de necesidad de contratación del contenido HTML
+    """
+    try:
+        soup = BeautifulSoup(html_content, 'html.parser')
+        
+        # Buscar el texto "Código Necesidad de Contratación:"
+        codigo_element = soup.find('strong', string=re.compile(r'Código Necesidad de Contratación'))
+        
+        if codigo_element:
+            # Obtener el texto del elemento padre (que contiene el código)
+            parent_text = codigo_element.parent.get_text(strip=True)
+            
+            # Extraer el código usando regex - buscar el patrón NIC-XXXXX-XXXX-XXXXX
+            codigo_match = re.search(r'Código Necesidad de Contratación:\s*(NIC-[0-9]+-[0-9]+-[0-9]+)', parent_text)
+            
+            if codigo_match:
+                codigo = codigo_match.group(1).strip()
+                print(f"    [OK] Código encontrado: {codigo}")
+                return codigo
+            else:
+                print(f"    [ERROR] No se pudo extraer el código del texto")
+                print(f"    [DEBUG] Texto encontrado: {parent_text[:100]}...")
+                return None
+        else:
+            print(f"    [ERROR] No se encontró el elemento con 'Código Necesidad de Contratación'")
+            return None
+            
+    except Exception as e:
+        print(f"    [ERROR] Error extrayendo código: {e}")
+        return None
+
 def get_total_pages(driver):
     """
     Get the total number of pages from pagination
@@ -84,10 +118,10 @@ def get_total_pages(driver):
 
 def extract_detail_page_data(driver, detail_url):
     """
-    Extract data from detail page (product table)
+    Extract data from detail page (product table) and código de contratación
     """
     try:
-        print(f"    🔍 Extrayendo datos de página de detalle: {detail_url}")
+        print(f"    [INFO] Extrayendo datos de página de detalle: {detail_url}")
         
         # Handle relative URLs
         if detail_url.startswith('../'):
@@ -113,12 +147,15 @@ def extract_detail_page_data(driver, detail_url):
         html_content = driver.page_source
         soup = BeautifulSoup(html_content, 'html.parser')
         
+        # Extract código de necesidad de contratación
+        codigo_contratacion = extract_codigo_from_html_content(html_content)
+        
         # Look for the first table (which contains the product information)
         tables = soup.find_all('table')
         
         if not tables:
-            print(f"    ❌ No se encontraron tablas en: {detail_url}")
-            return []
+            print(f"    [ERROR] No se encontraron tablas en: {detail_url}")
+            return [], codigo_contratacion
         
         # Use the first table (which contains product data)
         product_table = tables[0]
@@ -134,12 +171,12 @@ def extract_detail_page_data(driver, detail_url):
                 row_data = [cell.get_text(strip=True) for cell in cells]
                 product_data.append(row_data)
         
-        print(f"    ✅ Extraídos {len(product_data)} productos de la página de detalle")
-        return product_data
+        print(f"    [OK] Extraídos {len(product_data)} productos de la página de detalle")
+        return product_data, codigo_contratacion
         
     except Exception as e:
-        print(f"    ❌ Error extrayendo datos de página de detalle: {e}")
-        return []
+        print(f"    [ERROR] Error extrayendo datos de página de detalle: {e}")
+        return [], None
 
 def extract_table_data_from_page(driver, page_num, extract_details=False):
     """
@@ -418,7 +455,7 @@ def filter_data_by_keywords(df):
     filtered_rows = []
     matched_categories = []
     
-    print(f"\n🔍 Filtrando datos por palabras clave en: '{descripcion_col}'")
+    print(f"\n[INFO] Filtrando datos por palabras clave en: '{descripcion_col}'")
     print("=" * 60)
     
     for idx, row in df.iterrows():
@@ -450,15 +487,15 @@ def filter_data_by_keywords(df):
         filtered_df = pd.DataFrame(filtered_rows, columns=new_columns)
         
         # Print summary
-        print(f"✅ Registros encontrados: {len(filtered_df)}")
-        print("\n📊 Resumen por categoría:")
+        print(f"[OK] Registros encontrados: {len(filtered_df)}")
+        print("\n[INFO] Resumen por categoría:")
         category_counts = pd.Series(matched_categories).value_counts()
         for category, count in category_counts.items():
             print(f"   • {category}: {count} registros")
         
         return filtered_df
     else:
-        print("❌ No se encontraron registros que coincidan con las palabras clave")
+        print("[ERROR] No se encontraron registros que coincidan con las palabras clave")
         return pd.DataFrame()
 
 def clean_data(df):
@@ -515,26 +552,27 @@ def export_to_excel(df, output_file):
 
 def extract_details_for_filtered_records(df_filtered, base_url):
     """
-    Extract product details only for filtered records
+    Extract product details only for filtered records with código de contratación
     """
     if df_filtered.empty:
-        print("❌ No hay registros filtrados para extraer detalles")
+        print("[ERROR] No hay registros filtrados para extraer detalles")
         return df_filtered
     
-    print(f"\n🔍 EXTRAYENDO DETALLES DE PRODUCTOS PARA REGISTROS FILTRADOS")
+    print(f"\n[INFO] EXTRAYENDO DETALLES DE PRODUCTOS PARA REGISTROS FILTRADOS")
     print("=" * 70)
-    print(f"📊 Registros filtrados a procesar: {len(df_filtered)}")
+    print(f"[INFO] Registros filtrados a procesar: {len(df_filtered)}")
     
     driver = None
     try:
         driver = setup_driver()
         if not driver:
-            print("❌ No se pudo configurar el driver")
+            print("[ERROR] No se pudo configurar el driver")
             return df_filtered
         
         # Add column for product details
         df_filtered = df_filtered.copy()
         df_filtered['Detalles_Productos'] = [[] for _ in range(len(df_filtered))]
+        df_filtered['Codigo_Necesidad_Contratacion'] = [None for _ in range(len(df_filtered))]
         
         # Check if we have detail URLs in the DataFrame
         detail_url_column = None
@@ -544,15 +582,15 @@ def extract_details_for_filtered_records(df_filtered, base_url):
                 break
         
         if detail_url_column is None:
-            print("❌ No se encontró columna con URLs de detalle")
+            print("[ERROR] No se encontró columna con URLs de detalle")
             print("   Columnas disponibles:", list(df_filtered.columns))
             return df_filtered
         
-        print(f"✅ Usando columna de URLs: {detail_url_column}")
+        print(f"[OK] Usando columna de URLs: {detail_url_column}")
         
         # Process each filtered record
         for idx, row in df_filtered.iterrows():
-            print(f"\n📋 Procesando registro {idx + 1}/{len(df_filtered)}")
+            print(f"\n[INFO] Procesando registro {idx + 1}/{len(df_filtered)}")
             print(f"   Entidad: {row.get('Entidad Contratante', 'N/A')}")
             print(f"   Descripción: {row.get('Descripción del Objeto de compra', 'N/A')[:80]}...")
             
@@ -560,28 +598,38 @@ def extract_details_for_filtered_records(df_filtered, base_url):
             detail_url = row.get(detail_url_column, "")
             
             if detail_url and detail_url.strip():
-                print(f"   🔗 URL de detalle: {detail_url}")
+                print(f"   [INFO] URL de detalle: {detail_url}")
                 try:
                     # Extract product details from the detail page
-                    detail_data = extract_detail_page_data(driver, detail_url)
+                    detail_data, codigo_contratacion = extract_detail_page_data(driver, detail_url)
                     if detail_data:
                         df_filtered.at[idx, 'Detalles_Productos'] = detail_data
-                        print(f"   ✅ Extraídos {len(detail_data)} productos")
+                        print(f"   [OK] Extraídos {len(detail_data)} productos")
                     else:
-                        print(f"   ❌ No se pudieron extraer productos")
+                        print(f"   [ERROR] No se pudieron extraer productos")
                         df_filtered.at[idx, 'Detalles_Productos'] = []
+                    
+                    if codigo_contratacion:
+                        df_filtered.at[idx, 'Codigo_Necesidad_Contratacion'] = codigo_contratacion
+                        print(f"   [OK] Código de contratación: {codigo_contratacion}")
+                    else:
+                        print(f"   [ERROR] No se pudo extraer código de contratación")
+                        df_filtered.at[idx, 'Codigo_Necesidad_Contratacion'] = None
+                        
                 except Exception as e:
-                    print(f"   ❌ Error extrayendo detalles: {e}")
+                    print(f"   [ERROR] Error extrayendo detalles: {e}")
                     df_filtered.at[idx, 'Detalles_Productos'] = []
+                    df_filtered.at[idx, 'Codigo_Necesidad_Contratacion'] = None
             else:
-                print(f"   ⏭️  No hay URL de detalle disponible")
+                print(f"   [INFO] No hay URL de detalle disponible")
                 df_filtered.at[idx, 'Detalles_Productos'] = []
+                df_filtered.at[idx, 'Codigo_Necesidad_Contratacion'] = None
         
-        print(f"\n✅ Procesamiento de detalles completado")
+        print(f"\n[OK] Procesamiento de detalles completado")
         return df_filtered
         
     except Exception as e:
-        print(f"❌ Error extrayendo detalles: {e}")
+        print(f"[ERROR] Error extrayendo detalles: {e}")
         return df_filtered
     finally:
         if driver:
@@ -592,23 +640,24 @@ def process_product_details(df):
     Process and display product details information
     """
     if 'Detalles_Productos' not in df.columns:
-        print("❌ No se encontraron detalles de productos en el DataFrame")
+        print("[ERROR] No se encontraron detalles de productos en el DataFrame")
         return df
     
-    print(f"\n🔍 PROCESANDO DETALLES DE PRODUCTOS")
+    print(f"\n[INFO] PROCESANDO DETALLES DE PRODUCTOS")
     print("=" * 50)
     
     # Count records with product details
     records_with_details = df['Detalles_Productos'].apply(lambda x: len(x) > 0 if isinstance(x, list) else False).sum()
-    print(f"📊 Registros con detalles de productos: {records_with_details}/{len(df)}")
+    print(f"[INFO] Registros con detalles de productos: {records_with_details}/{len(df)}")
     
     # Show sample product details
     sample_records = df[df['Detalles_Productos'].apply(lambda x: len(x) > 0 if isinstance(x, list) else False)].head(3)
     
     for idx, row in sample_records.iterrows():
-        print(f"\n📋 Registro {idx + 1}:")
+        print(f"\n[INFO] Registro {idx + 1}:")
         print(f"   Entidad: {row.get('Entidad Contratante', 'N/A')}")
         print(f"   Descripción: {row.get('Descripción del Objeto de compra', 'N/A')[:100]}...")
+        print(f"   Código: {row.get('Codigo_Necesidad_Contratacion', 'N/A')}")
         
         if isinstance(row['Detalles_Productos'], list) and len(row['Detalles_Productos']) > 0:
             print(f"   Productos encontrados: {len(row['Detalles_Productos'])}")
@@ -616,7 +665,7 @@ def process_product_details(df):
                 if len(product) >= 5:
                     print(f"     {i+1}. {product[2][:50]}... (Cantidad: {product[4]})")
         else:
-            print("   ❌ No se encontraron productos")
+            print("   [ERROR] No se encontraron productos")
     
     return df
 
@@ -625,28 +674,28 @@ def display_dataframe_info(df, df_name="DataFrame"):
     Display comprehensive information about a DataFrame
     """
     if df is None or df.empty:
-        print(f"❌ {df_name} está vacío o no disponible")
+        print(f"[ERROR] {df_name} está vacío o no disponible")
         return
     
-    print(f"\n📊 INFORMACIÓN DEL {df_name.upper()}")
+    print(f"\n[INFO] INFORMACIÓN DEL {df_name.upper()}")
     print("=" * 60)
-    print(f"📏 Dimensiones: {df.shape[0]} filas x {df.shape[1]} columnas")
-    print(f"📋 Columnas: {list(df.columns)}")
-    print(f"🔍 Tipos de datos:")
+    print(f"[INFO] Dimensiones: {df.shape[0]} filas x {df.shape[1]} columnas")
+    print(f"[INFO] Columnas: {list(df.columns)}")
+    print(f"[INFO] Tipos de datos:")
     for col, dtype in df.dtypes.items():
         print(f"   • {col}: {dtype}")
     
-    print(f"\n📈 Estadísticas básicas:")
+    print(f"\n[INFO] Estadísticas básicas:")
     print(f"   • Registros no nulos por columna:")
     for col in df.columns:
         non_null_count = df[col].notna().sum()
         print(f"     - {col}: {non_null_count}/{len(df)} ({non_null_count/len(df)*100:.1f}%)")
     
-    print(f"\n🔍 Primeras 5 filas:")
+    print(f"\n[INFO] Primeras 5 filas:")
     print(df.head().to_string())
     
     if len(df) > 5:
-        print(f"\n🔍 Últimas 3 filas:")
+        print(f"\n[INFO] Últimas 3 filas:")
         print(df.tail(3).to_string())
 
 def main():
@@ -654,22 +703,22 @@ def main():
     Main function
     """
     url = "https://www.compraspublicas.gob.ec/ProcesoContratacion/compras/NCO/FrmNCOListado.cpe"
-    output_file = "necesidades_contratacion_filtrado_TI.xlsx"
+    output_file = "necesidades_contratacion_filtrado_TI_con_codigo.xlsx"
     
-    print("=== EXTRACTOR DE DATOS DE CONTRATACIÓN PÚBLICA CON PAGINACIÓN ===\n")
+    print("=== EXTRACTOR DE DATOS DE CONTRATACIÓN PÚBLICA CON PAGINACIÓN Y CÓDIGO ===\n")
     
     max_pages = int(os.getenv("MAX_PAGES", ""))
     
     # STEP 1: Extract main data from all pages (without details)
-    print("🔄 PASO 1: Extrayendo datos principales de todas las páginas...")
+    print("[PASO 1] Extrayendo datos principales de todas las páginas...")
     df = extract_all_pages_data(url, max_pages=max_pages)  # Set max_pages=5 for testing
     
     if df is None or df.empty:
-        print("❌ No se pudieron extraer datos de la página web")
+        print("[ERROR] No se pudieron extraer datos de la página web")
         return None
     
-    print(f"\n📊 Datos principales extraídos: {len(df)} filas, {len(df.columns)} columnas")
-    print(f"Columnas: {list(df.columns)}")
+    print(f"\n[INFO] Datos principales extraídos: {len(df)} filas, {len(df.columns)} columnas")
+    print(f"[INFO] Columnas: {list(df.columns)}")
     
     # Clean data
     df = clean_data(df)
@@ -678,18 +727,18 @@ def main():
     display_dataframe_info(df, "DataFrame Original")
     
     # STEP 2: Filter data by keywords
-    print("\n🔄 PASO 2: Filtrando datos por palabras clave...")
+    print("\n[PASO 2] Filtrando datos por palabras clave...")
     df_filtered = filter_data_by_keywords(df)
     
     if df_filtered.empty:
-        print("\n❌ No se encontraron registros que coincidan con los criterios de filtrado")
+        print("\n[ERROR] No se encontraron registros que coincidan con los criterios de filtrado")
         return df  # Return original DataFrame even if filtered is empty
     
     # Display information about the filtered DataFrame
     display_dataframe_info(df_filtered, "DataFrame Filtrado")
     
     # STEP 3: Extract product details only for filtered records
-    print("\n🔄 PASO 3: Extrayendo detalles de productos solo para registros filtrados...")
+    print("\n[PASO 3] Extrayendo detalles de productos solo para registros filtrados...")
     df_with_details = extract_details_for_filtered_records(df_filtered, url)
     
     # Process and display product details
@@ -697,7 +746,7 @@ def main():
         df_with_details = process_product_details(df_with_details)
         
         # Create a separate DataFrame for product details
-        print(f"\n📋 CREANDO DATAFRAME DE DETALLES DE PRODUCTOS")
+        print(f"\n[INFO] CREANDO DATAFRAME DE DETALLES DE PRODUCTOS")
         print("=" * 60)
         
         product_details_list = []
@@ -709,6 +758,7 @@ def main():
                             'Registro_ID': idx,
                             'Entidad_Contratante': row.get('Entidad Contratante', 'N/A'),
                             'Descripcion_Objeto': row.get('Descripción del Objeto de compra', 'N/A'),
+                            'Codigo_Necesidad_Contratacion': row.get('Codigo_Necesidad_Contratacion', 'N/A'),
                             'No': product[0] if len(product) > 0 else '',
                             'CPC': product[1] if len(product) > 1 else '',
                             'Descripcion_Producto': product[2] if len(product) > 2 else '',
@@ -719,18 +769,18 @@ def main():
         # Create DataFrame for product details
         if product_details_list:
             df_product_details = pd.DataFrame(product_details_list)
-            print(f"✅ DataFrame de detalles de productos creado: {len(df_product_details)} productos")
-            print(f"📊 Columnas: {list(df_product_details.columns)}")
+            print(f"[OK] DataFrame de detalles de productos creado: {len(df_product_details)} productos")
+            print(f"[INFO] Columnas: {list(df_product_details.columns)}")
             
             # Display the product details DataFrame
-            print(f"\n📋 DATAFRAME DE DETALLES DE PRODUCTOS:")
+            print(f"\n[INFO] DATAFRAME DE DETALLES DE PRODUCTOS:")
             print("=" * 80)
             print(df_product_details.to_string(index=False))
             
             # Save product details to separate Excel file
-            product_details_file = "detalles_productos.xlsx"
+            product_details_file = "detalles_productos_con_codigo.xlsx"
             df_product_details.to_excel(product_details_file, index=False)
-            print(f"\n💾 Detalles de productos guardados en: {product_details_file}")
+            print(f"\n[OK] Detalles de productos guardados en: {product_details_file}")
             
             # Analizando con Gemini
             df_consolidado = pd.DataFrame()
@@ -746,37 +796,38 @@ def main():
                         df_consolidado.loc[index, 'Prioridad'] = resultado_ia.get('prioridad') # <--- NUEVO
                         df_consolidado.loc[index, 'Motivo IA'] = resultado_ia.get('motivo')
                         df_consolidado.loc[index, 'Acción IA'] = resultado_ia.get('accion_recomendada')
-                        df_consolidado.loc[index, 'Contrato'] = row.get('CPC')
+                        df_consolidado.loc[index, 'Codigo Necesidad de Contratacion'] = row.get('Codigo_Necesidad_Contratacion')
+                        df_consolidado.loc[index, 'Entidad Contratante'] = row.get('Entidad_Contratante')
                         time.sleep(4.1)
             
-                print(f"📊 Columnas del Analisis: {list(df_consolidado.columns)}")
+                print(f"[INFO] Columnas del Analisis: {list(df_consolidado.columns)}")
                 
                 # Display the product details DataFrame
                 print(df_consolidado.to_string(index=False))
                 
                 # Export df_consolidado to Excel
-                consolidado_file = "analisis_gemini_consolidado.xlsx"
+                consolidado_file = "analisis_gemini_consolidado_con_codigo.xlsx"
                 try:
                     df_consolidado.to_excel(consolidado_file, index=False)
-                    print(f"\n💾 Análisis consolidado guardado en: {consolidado_file}")
+                    print(f"\n[OK] Análisis consolidado guardado en: {consolidado_file}")
                 except Exception as e:
-                    print(f"❌ Error guardando análisis consolidado: {e}")
+                    print(f"[ERROR] Error guardando análisis consolidado: {e}")
             
             
         else:
-            print("❌ No se encontraron detalles de productos para mostrar")
+            print("[ERROR] No se encontraron detalles de productos para mostrar")
             df_product_details = pd.DataFrame()
     
     # Export final data to Excel
-    print(f"\n💾 Exportando datos finales a {output_file}...")
+    print(f"\n[INFO] Exportando datos finales a {output_file}...")
     success = export_to_excel(df_with_details, output_file)
     
     if success:
-        print(f"\n🎉 Proceso completado exitosamente!")
-        print(f"Archivo generado: {output_file}")
-        print(f"Total de registros extraídos: {len(df)}")
-        print(f"Registros filtrados (TI): {len(df_filtered)}")
-        print(f"Registros con detalles: {len(df_with_details)}")
+        print(f"\n[OK] Proceso completado exitosamente!")
+        print(f"[INFO] Archivo generado: {output_file}")
+        print(f"[INFO] Total de registros extraídos: {len(df)}")
+        print(f"[INFO] Registros filtrados (TI): {len(df_filtered)}")
+        print(f"[INFO] Registros con detalles: {len(df_with_details)}")
         
         # Return all DataFrames for further use
         result_dict = {
@@ -799,7 +850,7 @@ def main():
         return result_dict
         
     else:
-        print("\n❌ Error en la exportación")
+        print("\n[ERROR] Error en la exportación")
         return df  # Return original DataFrame even if export failed
 
 if __name__ == "__main__":
@@ -808,20 +859,20 @@ if __name__ == "__main__":
     
     # If result is a dictionary with DataFrames, provide additional information
     if isinstance(result, dict) and 'original_df' in result:
-        print(f"\n🔧 DATAFRAMES DISPONIBLES PARA USO:")
+        print(f"\n[INFO] DATAFRAMES DISPONIBLES PARA USO:")
         print("=" * 50)
         print("• result['original_df'] - DataFrame con todos los datos extraídos")
         print("• result['filtered_df'] - DataFrame con datos filtrados por TI")
         print("• result['excel_file'] - Ruta del archivo Excel generado")
-        print(f"\n💡 Ejemplo de uso:")
+        print(f"\n[INFO] Ejemplo de uso:")
         print("   original_data = result['original_df']")
         print("   filtered_data = result['filtered_df']")
         print("   print(f'Total registros: {len(original_data)}')")
         print("   print(f'Registros TI: {len(filtered_data)}')")
     elif result is not None:
-        print(f"\n🔧 DATAFRAME DISPONIBLE:")
+        print(f"\n[INFO] DATAFRAME DISPONIBLE:")
         print("=" * 30)
         print("• result - DataFrame con los datos extraídos")
-        print(f"\n💡 Ejemplo de uso:")
+        print(f"\n[INFO] Ejemplo de uso:")
         print("   data = result")
         print("   print(f'Total registros: {len(data)}')")
